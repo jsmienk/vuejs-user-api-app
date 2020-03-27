@@ -1,0 +1,36 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@types/jwt-decode": "^2.2.1",
+    "@types/socket.io-client": "^1.4.32",
+    "@types/vuelidate": "^0.7.11",
+    "axios": "^0.19.2",
+    "core-js": "^3.4.4",
+    "iso-639-1": "^2.1.1",
+    "jwt-decode": "^2.2.0",
+    "sanitize.css": "^11.0.0",
+    "socket.io-client": "^2.3.0",
+    "vue": "^2.6.10",
+    "vue-property-decorator": "^8.4.0",
+    "vue-router": "^3.0.3",
+    "vuelidate": "^0.7.5",
+    "vuex": "^3.1.2"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^4.1.0",
+    "@vue/cli-plugin-typescript": "^4.1.0",
+    "@vue/cli-plugin-vuex": "^4.1.0",
+    "@vue/cli-service": "^4.1.0",
+    "node-sass": "^4.12.0",
+    "sass-loader": "^8.0.0",
+    "typescript": "~3.5.3",
+    "vue-template-compiler": "^2.6.10"
+  }
+}
