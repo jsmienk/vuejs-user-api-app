@@ -33,6 +33,7 @@ export default class Register extends Vue {
 .button {
   display: inline-block;
   width: 100%;
+  background-color: $color-btn-2nd;
   border-radius: .3rem;
   text-decoration: none;
   text-transform: uppercase;
@@ -47,10 +48,6 @@ export default class Register extends Vue {
 
   &.button-main {
     background-color: $color-btn-main;
-  }
-
-  &.button-2nd {
-    background-color: $color-btn-2nd;
   }
 
   &.button-warn {

@@ -16,7 +16,7 @@
       @input="passw = $event" @link="passw$v = $event" required />
 
     <div class="button-row form-spacing">
-      <NavButton :to="Pages.MAIN" class="button-2nd" :active="true">Login</NavButton>
+      <NavButton :to="Pages.MAIN" :active="true">Login</NavButton>
       <NavButton class="button-main" @click="onRegisterClick">Register</NavButton>
     </div>
   </form>

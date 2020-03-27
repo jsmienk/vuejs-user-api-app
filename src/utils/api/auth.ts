@@ -2,8 +2,9 @@ import API, { AuthenticationResponse } from '.'
 import { User } from './models'
 import Store, { Actions, Commits } from '@/utils/store'
 
-const LCL_EXPIRES = 'loginExpires'
-const LCL_USER_ID = 'uid'
+const LCL_EXPIRES = '_exp'
+const LCL_USER_ID = '_uid'
+const LCL_PASS2FA = '_2fa'
 
 // API CALLS
 
@@ -27,6 +28,7 @@ function saveLoginDetails(res: AuthenticationResponse, resolve: (value: User) =>
   // Save persistent info to local storage
   localStorage.setItem(LCL_EXPIRES, String(Date.now() + res.expiresIn))
   localStorage.setItem(LCL_USER_ID, res.user._id)
+  localStorage.setItem(LCL_PASS2FA, String(res.user.passed2FA))
   Store.commit(Commits.SET_USER, res.user)
   resolve(res.user)
 }
@@ -36,8 +38,15 @@ export function getAuthUserId(): string | null {
 }
 
 export function logout(): void {
+  API.logout()
+    .then(clearStorage)
+    .catch(clearStorage)
+}
+
+function clearStorage(): void {
   localStorage.removeItem(LCL_EXPIRES)
   localStorage.removeItem(LCL_USER_ID)
+  localStorage.removeItem(LCL_PASS2FA)
 }
 
 // ROUTER MIDDLEWARE
@@ -61,7 +70,7 @@ export function isLoggedIn(): Promise<Boolean> {
   return new Promise((resolve, _) => {
     Store.dispatch(Actions.GET_USER, { id: getAuthUserId() })
       .then(user => {
-        const _2fa: boolean = !user.use2FA || (user.use2FA && user.passed2FA)
+        const _2fa: boolean = !user.use2FA || (user.use2FA && (localStorage.getItem(LCL_PASS2FA) === 'true'))
         const expiresIn: string | null = localStorage.getItem(LCL_EXPIRES)
         resolve(_2fa && !!expiresIn && parseInt(expiresIn) > Date.now())
       })

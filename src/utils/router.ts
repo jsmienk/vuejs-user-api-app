@@ -14,6 +14,7 @@ export enum Pages {
   MAIN='MAIN',
   REGISTER='REGISTER',
   ACCOUNT='ACCOUNT',
+  PROFILE='PROFILE',
   ERROR='ERROR'
 }
 
@@ -21,7 +22,8 @@ export function PageRoutes(page: Pages, args?: [any]): string {
   switch (page) {
     case Pages.MAIN:     return `/`
     case Pages.REGISTER: return `/register`
-    case Pages.ACCOUNT:  return `/user/${args && args.length > 0 ? args[0] : ''}`
+    case Pages.ACCOUNT:  return `/account`
+    case Pages.PROFILE:  return `/user/${args && args.length > 0 ? args[0] : ''}`
     default: return '/404'
   }
 }
@@ -40,7 +42,7 @@ export default new VueRouter({
       component: Register
     },
     {
-      path: '/user/:id',
+      path: '/account',
       name: 'Account',
       beforeEnter: requireAuth,
       component: Account

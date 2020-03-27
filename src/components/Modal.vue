@@ -9,7 +9,7 @@
         <slot></slot>
       </main>
       <footer>
-        <NavButton class="button-2nd" @click="show = false">Close</NavButton>
+        <NavButton @click="show = false">Close</NavButton>
       </footer>
     </div>
   </div>

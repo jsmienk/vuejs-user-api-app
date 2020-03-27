@@ -14,12 +14,12 @@
         @input="passw = $event" @link="passw$v = $event" required />
 
       <div class="button-row form-spacing">
-        <NavButton :to="Pages.REGISTER" class="button-2nd" :active="true">Register</NavButton>
+        <NavButton :to="Pages.REGISTER" :active="true">Register</NavButton>
         <NavButton class="button-main" @click="onLoginClick">Login</NavButton>
       </div>
 
       <!-- Request password reset -->
-      <NavButton class="button-2nd form-spacing">Forgot password?</NavButton>
+      <NavButton class="form-spacing">Forgot password?</NavButton>
     </form>
   </div>
 
@@ -80,7 +80,7 @@ export default class Main extends Vue {
    * Helper to navigate to the user account
    */
   goToAccount(): void {
-    this.$router.push(PageRoutes(Pages.ACCOUNT, [getAuthUserId()]))
+    this.$router.push(PageRoutes(Pages.ACCOUNT))
       .catch(err => console.warn('$router.push: ' + err))
   }
 }

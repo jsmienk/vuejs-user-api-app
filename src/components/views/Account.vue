@@ -1,21 +1,65 @@
 <template>
-<main id="account" class="fullscreen screen-padding">
-    <h1>{{ user.name }}</h1>
-    <p>{{ user._id }}</p>
+<main id="account" class="screen-padding">
+  <!-- General user info -->
+  <h1>{{ user.name }}</h1>
+  <p class="user-id">{{ user._id }}</p>
+  <p class="user-email" v-if="user.email">{{ user.email }}</p>
+  <NavButton id="logout" @click="logout" class="button-warn">Log out</NavButton>
+
+  <!-- 2FA -->
+  <h3>Two-factor authentication (2FA)</h3>
+  <p>2FA is <span class="_2fa-enabled" :class="{ enabled: user.use2FA }">{{ user.use2FA ? 'enabled' : 'disabled' }}.</span></p>
+  <!-- Enable/disable -->
+  <div class="button-row">
+    <NavButton v-if="user.use2FA" @click="viewCodes">Show recovery codes</NavButton>
+    <NavButton @click="user.use2FA ? disable2FA : enable2FA">{{ user.use2FA ? 'Disable' : 'Enable' }} 2FA</NavButton>
+  </div>
+
+  <!-- Device sessions -->
+  <h3>Current device sessions</h3>
+  <!-- Loading/error messages -->
+  <p v-if="!sessionsError && sessions === null">Loading...</p>
+  <p v-if="!!sessions && sessions.length === 0">No current active sessions.</p>
+  <p v-if="!!sessionsError" class="text-error">{{ sessionsError }}</p>
+  <!-- Session list -->
+  <div class="device-session" v-for="session in sessions" :key="session._id">
+    <div class="info">
+      <!-- Icon -->
+      <img class="icon" src="@/assets/devices.svg" />
+      <!-- Text details -->
+      <div class="details">
+        <h4 class="device">{{ session.platform }} {{ session.application }}</h4>
+        <div class="expires">{{ getSessionDate(session) }}</div>
+        <div class="ip">{{ session.ip }}</div>
+        <div class="location" v-if="session.location">{{ session.location }}</div>
+      </div>
+    </div>
+
+    <!-- Revoke button -->
+    <NavButton @click="revokeSession(session.hash)" class="button-warn session-revoke">Revoke</NavButton>
+  </div>
 </main>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { Actions } from '@/utils/store'
-import { User } from '@/utils/api/models'
+import { getDateTimeString } from '@/utils/helpers'
 
-@Component
+import API from '@/utils/api'
+import { User, DeviceSession } from '@/utils/api/models'
+import { getAuthUserId, logout } from '@/utils/api/auth'
+import { Actions } from '@/utils/store'
+
+import NavButton from '@/components/NavButton.vue'
+import { Pages, PageRoutes } from '../../utils/router'
+
+@Component({
+  components: { NavButton }
+})
 export default class Profile extends Vue {
   // Default player while loading
   user: User = {
     _id: '',
-    player: '',
     name: '',
     email: '',
     verified: false,
@@ -23,22 +67,148 @@ export default class Profile extends Vue {
     use2FA: false,
     passed2FA: false
   }
+  sessions: DeviceSession[] | null = null
+  sessionsError: string = ''
+
+  getSessionDate(session: DeviceSession): string {
+    return getDateTimeString(new Date(session.since), true)
+  }
+
+  getSessionExpirationDate(session: DeviceSession): string {
+    const date: Date = new Date(session.since)
+    const exp: number = date.getUTCMilliseconds() + session.expires
+    return getDateTimeString(new Date(exp), true)
+  }
 
   mounted() {
     // Set user id from path parameter
-    this.user._id = this.$route.params.id
+    this.user._id = getAuthUserId() || ''
 
     // Get the player
     this.$store.dispatch(Actions.GET_USER, { id: this.user._id })
       .then(user => this.user = user)
       .catch(err => console.warn(err))
+
+    // Get device sessions
+    this.getSessions()
+  }
+
+  getSessions() {
+    this.sessionsError = ''
+    API.getDeviceSessions()
+      .then(res => {
+        this.sessionsError = ''
+        this.sessions = res.sessions
+      })
+      .catch(err => {
+        this.sessionsError = 'Device sessions cannot be loaded right now. Please try again later.'
+        console.warn(err)
+      })
+  }
+
+  disable2FA(): void {
+    // TODO
+  }
+
+  enable2FA(): void {
+    // TODO: modal
+  }
+
+  viewCodes(): void {
+    // TODO: modal
+  }
+
+  revokeSession(hash: string): void {
+    API.revokeSession(hash)
+      .then(this.getSessions)
+      .catch(err => this.sessionsError = 'Failed to delete session: ' + err.message)
+  }
+
+  /**
+   * Send the logout request, clear data, and go to the main page
+   */
+  logout(): void {
+    logout()
+    this.$router.push(PageRoutes(Pages.MAIN))
+      .catch(err => console.warn('$router.push: ' + err))
   }
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../style/colors';
 @import '../../style/vars';
 
-#account {}
+#account {
+  ._2fa-enabled {
+    font-weight: bold;
+    color: red;
+    &.enabled {
+      color: green;
+    }
+  }
+  .device-session {
+    margin-bottom: 1rem;
+    padding: $m1 $m2;
+    border-radius: .3rem;
+    background-color: #fafafa;
+    box-shadow: 0 .2rem .5rem #00000022;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    .info {
+      width: 100%;
+      display: flex;
+      justify-content: start;
+      align-items: self-start;
+      .icon {
+        width: 3rem;
+        display: none;
+        margin: $m2 $m2 0 0;
+      }
+      .details {
+        .device {
+          margin: 0;
+        }
+        .ip, .expires {
+          font-family: monospace;
+          margin-top: $m1;
+        }
+        .location {
+          border-top: 1px solid #00000033;
+          font-size: .9rem;
+        }
+      }
+    }
+    .session-revoke {
+      flex-shrink: 0;
+      width: initial;
+      margin-top: $m0;
+    }
+  }
+}
+
+@media screen and (min-width: $screen-size-1) {
+  #account {
+    .device-session {
+      .info {
+        .icon {
+          display: inline-block;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (min-width: $screen-size-2) {
+  #account {
+    .device-session {
+      flex-direction: row;
+      .info {
+        margin-right: $m2;
+      }
+    }
+  }
+}
 </style>

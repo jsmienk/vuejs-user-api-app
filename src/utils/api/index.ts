@@ -1,6 +1,7 @@
 import Axios, { AxiosResponse } from 'axios'
 import Config from '@/config'
-import { User } from './models'
+import { User, DeviceSession } from './models'
+import { getAuthUserId, logout } from './auth'
 
 
 const API = Axios.create({
@@ -36,6 +37,10 @@ export interface UserCreatedResponse {
   readonly message: string
 }
 
+export interface DeviceSessionsResponse {
+  readonly sessions: DeviceSession[]
+}
+
 
 // API CALLS
 
@@ -44,6 +49,10 @@ export default {
 
   async login(email: string, password: string): Promise<AuthenticationResponse> {
     return handleResponse(API.post('/auth/login', { email, password }))
+  },
+
+  async logout(): Promise<NoContentResponse> {
+    return handleResponse(API.post('/auth/logout'))
   },
 
   async requestReset(email: string): Promise<NoContentResponse> {
@@ -98,6 +107,14 @@ export default {
 
   async removeUserById(id: string): Promise<NoContentResponse> {
     return handleResponse(API.delete('/users/' + id))
+  },
+
+  async getDeviceSessions(): Promise<DeviceSessionsResponse> {
+    return handleResponse(API.get('/users/' + getAuthUserId() + '/sessions'))
+  },
+
+  async revokeSession(hash: string): Promise<NoContentResponse> {
+    return handleResponse(API.delete('/users/' + getAuthUserId() + '/sessions', { data: { hash } }))
   }
 }
 
