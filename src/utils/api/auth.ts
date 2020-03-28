@@ -24,6 +24,17 @@ export function verify2FA(token: string): Promise<User> {
   })
 }
 
+export function disable2FA(): Promise<User> {
+  return new Promise((resolve, reject) => {
+    API.disable2FA()
+      .then(_ => {
+        localStorage.setItem(LCL_PASS2FA, 'false')
+        resolve()
+      })
+      .catch(reject)
+  })
+}
+
 function saveLoginDetails(res: AuthenticationResponse, resolve: (value: User) => void) {
   // Save persistent info to local storage
   localStorage.setItem(LCL_EXPIRES, String(Date.now() + res.expiresIn))

@@ -22,7 +22,8 @@ export interface AuthenticationResponse {
 }
 
 export interface Prepared2FAResponse {
-  readonly registration: string
+  readonly registration: string,
+  readonly key2FA: string
 }
 
 export interface UserResponse {

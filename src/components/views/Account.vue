@@ -12,7 +12,7 @@
   <!-- Enable/disable -->
   <div class="button-row">
     <NavButton v-if="user.use2FA" @click="viewCodes">Show recovery codes</NavButton>
-    <NavButton @click="user.use2FA ? disable2FA : enable2FA">{{ user.use2FA ? 'Disable' : 'Enable' }} 2FA</NavButton>
+    <NavButton @click="on2FAClick">{{ user.use2FA ? 'Disable' : 'Enable' }} 2FA</NavButton>
   </div>
 
   <!-- Device sessions -->
@@ -38,25 +38,30 @@
     <!-- Revoke button -->
     <NavButton @click="revokeSession(session.hash)" class="button-warn session-revoke">Revoke</NavButton>
   </div>
+
+  <Setup2FAModal ref="setup2FAModal" @success="user.use2FA = true" />
+  <Notification ref="notification" />
 </main>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { getDateTimeString } from '@/utils/helpers'
-
 import API from '@/utils/api'
+import { getDateTimeString } from '@/utils/helpers'
 import { User, DeviceSession } from '@/utils/api/models'
 import { getAuthUserId, logout } from '@/utils/api/auth'
+import { Pages, PageRoutes } from '@/utils/router'
 import { Actions } from '@/utils/store'
+import { disable2FA } from '@/utils/api/auth'
 
 import NavButton from '@/components/NavButton.vue'
-import { Pages, PageRoutes } from '../../utils/router'
+import Setup2FAModal from '@/components/auth/Setup2FA.vue'
+import Notification from '@/components/Notification.vue'
 
 @Component({
-  components: { NavButton }
+  components: { NavButton, Setup2FAModal, Notification }
 })
-export default class Profile extends Vue {
+export default class Account extends Vue {
   // Default player while loading
   user: User = {
     _id: '',
@@ -69,18 +74,10 @@ export default class Profile extends Vue {
   }
   sessions: DeviceSession[] | null = null
   sessionsError: string = ''
-
-  getSessionDate(session: DeviceSession): string {
-    return getDateTimeString(new Date(session.since), true)
-  }
-
-  getSessionExpirationDate(session: DeviceSession): string {
-    const date: Date = new Date(session.since)
-    const exp: number = date.getUTCMilliseconds() + session.expires
-    return getDateTimeString(new Date(exp), true)
-  }
+  notification!: Notification
 
   mounted() {
+    this.notification = (this.$refs.notification as Notification)
     // Set user id from path parameter
     this.user._id = getAuthUserId() || ''
 
@@ -93,6 +90,19 @@ export default class Profile extends Vue {
     this.getSessions()
   }
 
+  getSessionDate(session: DeviceSession): string {
+    return getDateTimeString(new Date(session.since), true)
+  }
+
+  getSessionExpirationDate(session: DeviceSession): string {
+    const date: Date = new Date(session.since)
+    const exp: number = date.getUTCMilliseconds() + session.expires
+    return getDateTimeString(new Date(exp), true)
+  }
+
+  /**
+   * Retrieve device sessions from API
+   */
   getSessions() {
     this.sessionsError = ''
     API.getDeviceSessions()
@@ -106,18 +116,43 @@ export default class Profile extends Vue {
       })
   }
 
-  disable2FA(): void {
-    // TODO
+  on2FAClick() {
+    this.user.use2FA ? this.disable2FA() : this.enable2FA()
   }
 
+  /**
+   * Disable 2FA via API
+   */
+  disable2FA(): void {
+    disable2FA()
+      .then(_ => {
+        // Update UI
+        this.user.use2FA = false
+        this.notification.notify('2FA disabled!')
+      })
+      .catch(err => this.notification.notify(err.message, false))
+  }
+
+  /**
+   * Enable 2FA via API
+   */
   enable2FA(): void {
+    const modal = (this.$refs.setup2FAModal as Setup2FAModal)
+    modal.start()
     // TODO: modal
   }
 
+  /**
+   * View account recovery codes
+   * TODO
+   */
   viewCodes(): void {
     // TODO: modal
   }
 
+  /**
+   * Revoke a session using its hash
+   */
   revokeSession(hash: string): void {
     API.revokeSession(hash)
       .then(this.getSessions)
@@ -160,7 +195,7 @@ export default class Profile extends Vue {
     .info {
       width: 100%;
       display: flex;
-      justify-content: start;
+      justify-content: flex-start;
       align-items: self-start;
       .icon {
         width: 3rem;

@@ -4,7 +4,7 @@ export interface User {
     readonly email?: string,
     readonly name: string,
     readonly creation: Date,
-    readonly use2FA: boolean,
+    use2FA: boolean,
     readonly passed2FA: boolean
 }
 

@@ -1,5 +1,5 @@
 <template>
-<Modal class="modal-error" ref="modalError" :title="error.title">
+<Modal class="modal-error" ref="modal" :title="error.title">
   <p>{{ error.message }}</p>
   <p>Please try again.</p>
 </Modal>
@@ -22,7 +22,7 @@ export default class ErrorModal extends Vue {
 
   @Watch('error')
   onErrorChanged() {
-    this.$refs.modalError.toggle(true)
+    (this.$refs.modal as Modal).open()
   }
 }
 </script>

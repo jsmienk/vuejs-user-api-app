@@ -66,7 +66,7 @@ export default class Main extends Vue {
           // On success, check if the user has 2FA enabled
           if (user.use2FA)
             // Prompt OTP
-            this.$refs.modalAuth2FA.open()
+            (this.$refs.modalAuth2FA as Auth2FAModal).open()
           else 
             // Go to account
             this.goToAccount()

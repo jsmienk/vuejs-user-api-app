@@ -2,13 +2,13 @@
 <transition name="modal">
   <div v-show="show" class="modal-bkg">
     <div class="modal">
-      <header>
+      <header v-if="showHeader">
         <h3>{{ title }}</h3>
       </header>
       <main>
         <slot></slot>
       </main>
-      <footer>
+      <footer v-if="showFooter">
         <NavButton @click="show = false">Close</NavButton>
       </footer>
     </div>
@@ -25,11 +25,17 @@ import NavButton from '@/components/NavButton.vue'
 })
 export default class Modal extends Vue {
   @Prop() title!: string
+  @Prop({ default: true }) showHeader!: boolean
+  @Prop({ default: true }) showFooter!: boolean
 
   show: boolean = false
 
-  toggle(show: boolean) {
+  public open() {
     this.show = true
+  }
+
+  public close() {
+    this.show = false
   }
 }
 </script>

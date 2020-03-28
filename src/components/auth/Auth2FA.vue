@@ -1,5 +1,5 @@
 <template>
-<Modal ref="auth2FAModal" class="auth-2fa" title="Two-Factor Authentication">
+<Modal ref="modal" class="auth-2fa" title="Two-Factor Authentication">
   <form>
     <p>Please enter a One-Time-Password from your registered authenticator application.</p>
 
@@ -36,7 +36,7 @@ export default class Auth2FA extends Vue {
     this.otp$v.$reset()
     this.otp = ''
     this.errorText = ''
-    this.$refs.auth2FAModal.toggle(true)
+    ;(this.$refs.modal as Modal).open()
   }
 
   onCodeSubmit() {
