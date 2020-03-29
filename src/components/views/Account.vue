@@ -4,15 +4,15 @@
   <h1>{{ user.name }}</h1>
   <p class="user-id">{{ user._id }}</p>
   <p class="user-email" v-if="user.email">{{ user.email }}</p>
-  <NavButton id="logout" @click="logout" class="button-warn">Log out</NavButton>
+  <NavButton id="logout" @click-load="logout" class="button-warn">Log out</NavButton>
 
   <!-- 2FA -->
   <h3>Two-factor authentication (2FA)</h3>
   <p>2FA is <span class="_2fa-enabled" :class="{ enabled: user.use2FA }">{{ user.use2FA ? 'enabled' : 'disabled' }}.</span></p>
   <!-- Enable/disable -->
   <div class="button-row">
-    <NavButton v-if="user.use2FA" @click="viewCodes">Show recovery codes</NavButton>
-    <NavButton @click="on2FAClick">{{ user.use2FA ? 'Disable' : 'Enable' }} 2FA</NavButton>
+    <NavButton @click-load="viewCodes" v-if="user.use2FA">Show recovery codes</NavButton>
+    <NavButton @click-load="on2FAClick">{{ user.use2FA ? 'Disable' : 'Enable' }} 2FA</NavButton>
   </div>
 
   <!-- Device sessions -->
@@ -36,7 +36,7 @@
     </div>
 
     <!-- Revoke button -->
-    <NavButton @click="revokeSession(session.hash)" class="button-warn session-revoke">Revoke</NavButton>
+    <NavButton @click-load="revokeSession($event, session.hash)" class="button-warn session-revoke">Revoke</NavButton>
   </div>
 
   <Setup2FAModal ref="setup2FAModal" @success="user.use2FA = true" />
@@ -116,14 +116,14 @@ export default class Account extends Vue {
       })
   }
 
-  on2FAClick() {
-    this.user.use2FA ? this.disable2FA() : this.enable2FA()
+  on2FAClick(done: () => void) {
+    this.user.use2FA ? this.disable2FA(done) : this.enable2FA(done)
   }
 
   /**
    * Disable 2FA via API
    */
-  disable2FA(): void {
+  disable2FA(done: () => void): void {
     disable2FA()
       .then(_ => {
         // Update UI
@@ -131,32 +131,35 @@ export default class Account extends Vue {
         this.notification.notify('2FA disabled!')
       })
       .catch(err => this.notification.notify(err.message, false))
+      .finally(done)
   }
 
   /**
    * Enable 2FA via API
    */
-  enable2FA(): void {
+  enable2FA(done: () => void): void {
     const modal = (this.$refs.setup2FAModal as Setup2FAModal)
     modal.start()
-    // TODO: modal
+    done()
   }
 
   /**
    * View account recovery codes
    * TODO
    */
-  viewCodes(): void {
+  viewCodes(done: () => void): void {
     // TODO: modal
+    done()
   }
 
   /**
    * Revoke a session using its hash
    */
-  revokeSession(hash: string): void {
+  revokeSession(done: () => void, hash: string): void {
     API.revokeSession(hash)
       .then(this.getSessions)
       .catch(err => this.sessionsError = 'Failed to delete session: ' + err.message)
+      .finally(done)
   }
 
   /**

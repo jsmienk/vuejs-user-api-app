@@ -15,7 +15,7 @@
 
       <div class="button-row form-spacing">
         <NavButton :to="Pages.REGISTER" :active="true">Register</NavButton>
-        <NavButton class="button-main" @click="onLoginClick">Login</NavButton>
+        <NavButton class="button-main" @click-load="onLoginClick">Login</NavButton>
       </div>
 
       <!-- Request password reset -->
@@ -55,7 +55,7 @@ export default class Main extends Vue {
 
   data() { return { Pages } }
 
-  onLoginClick(): boolean {
+  onLoginClick(done: () => void): boolean {
     // input validation
     this.email$v.$touch()
     this.passw$v.$touch()
@@ -72,7 +72,8 @@ export default class Main extends Vue {
             this.goToAccount()
         })
         .catch(err => this.error = { title: 'Login Error', message: 'Invalid credentials were provided!' })
-    }
+        .finally(done)
+    } else done()
     return false
   }
 

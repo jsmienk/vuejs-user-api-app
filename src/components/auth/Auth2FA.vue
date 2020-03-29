@@ -6,7 +6,7 @@
     <TextInput type="code" label="One-Time-Password"
       @input="otp = $event" @link="otp$v = $event" required />
 
-    <NavButton class="button-main form-spacing" @click="onCodeSubmit">Submit Code</NavButton>
+    <NavButton class="button-main form-spacing" @click-load="onCodeSubmit">Submit Code</NavButton>
 
     <p class="text-error">{{ errorText }}</p>
   </form>
@@ -39,14 +39,16 @@ export default class Auth2FA extends Vue {
     ;(this.$refs.modal as Modal).open()
   }
 
-  onCodeSubmit() {
+  onCodeSubmit(done: () => void) {
     this.errorText = ''
     this.otp$v.$touch()
     if (!this.otp$v.$invalid) {
       verify2FA(this.otp)
         .then(user => this.$emit('success', user))
         .catch(err => this.errorText = 'Invalid One-Time-Password. Please try again.')
+        .finally(done)
     } else {
+      done()
       this.errorText = 'One-Time-Password consists of 6 or 7 digits.'
     }
   }

@@ -17,7 +17,7 @@
 
     <div class="button-row form-spacing">
       <NavButton :to="Pages.MAIN" :active="true">Login</NavButton>
-      <NavButton class="button-main" @click="onRegisterClick">Register</NavButton>
+      <NavButton class="button-main" @click-load="onRegisterClick">Register</NavButton>
     </div>
   </form>
 
@@ -52,7 +52,7 @@ export default class Register extends Vue {
 
   data() { return { Pages } }
 
-  onRegisterClick(): boolean {
+  onRegisterClick(done: () => void): boolean {
     this.email$v.$touch()
     this.dname$v.$touch()
     this.passw$v.$touch()
@@ -77,6 +77,7 @@ export default class Register extends Vue {
               break
           }
         })
+        .finally(done)
     }
     return false
   }

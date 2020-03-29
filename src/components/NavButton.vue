@@ -5,8 +5,9 @@
     <router-link class="internal" v-if="active" :to="toRaw">
       <slot></slot>
     </router-link>
-    <a class="internal" v-if="!active" href="#" @click="$emit('click', $event)">
-      <slot></slot>
+    <a class="internal" :class="{ loading }" v-if="!active" href="#" @click="onClick">
+      <span v-if="loading">. . .</span>
+      <span v-if="!loading"><slot></slot></span>
     </a>
   </span>
 </template>
@@ -21,8 +22,16 @@ export default class Register extends Vue {
   @Prop() args!: [any]
   @Prop() active!: boolean
 
+  loading: boolean = false
+
   get toRaw(): string {
     return PageRoutes(this.to, this.args)
+  }
+
+  onClick(): void {
+    if (this.loading) return
+    this.loading = true
+    this.$emit('click-load', () => this.loading = false)
   }
 }
 </script>
@@ -35,21 +44,22 @@ export default class Register extends Vue {
   width: 100%;
   background-color: $color-btn-2nd;
   border-radius: .3rem;
-  text-decoration: none;
   text-transform: uppercase;
   text-align: center;
   font-size: 1rem;
-
   .internal {
     padding: .3rem 1.8rem;
     width: 100%;
     display: inline-block;
+    text-decoration: none;
+    &.loading {
+      opacity: .5;
+      
+    }
   }
-
   &.button-main {
     background-color: $color-btn-main;
   }
-
   &.button-warn {
     background-color: $color-btn-warn;
     color: $color-text-light;

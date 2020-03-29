@@ -1,13 +1,15 @@
 <template>
 <div>
-  <Modal ref="modal" class="setup-2fa" title="Two-Factor Authentication">
+  <Modal ref="modal" class="setup-2fa" title="Two-Factor Authentication" close-text="Cancel">
     <!-- Instructions -->
     <p>To enable 2FA, follow these steps:</p>
     <p>1. Open any authenticator application (e.g. Authy and Google Authenticator).</p>
     <p>2. Scan the QR-code or manually enter the key to register this service to the authenticator application.</p>
 
     <!-- QR code -->
-    <img v-show="!!qrUrl" :src="qrUrl" class="qr-code" />
+    <div class="qr-code">
+      <img v-show="!!qrUrl" :src="qrUrl" class="qr-code" />
+    </div>
 
     <!-- Manual key -->
     <p class="key">{{ key }}</p>
@@ -20,7 +22,7 @@
         @input="otp = $event" @link="otp$v = $event" required />
 
       <!-- Submit button -->
-      <NavButton class="button-main form-spacing" @click="onCodeSubmit">Submit Code</NavButton>
+      <NavButton class="button-main form-spacing" @click-load="onCodeSubmit">Submit Code</NavButton>
     </form>
   </Modal>
   <Notification ref="notification" />
@@ -48,7 +50,7 @@ export default class Setup2FAModal extends Vue {
   otp: string = ''
   otp$v!: Validation
   qrUrl: string = ''
-  key: string = '0000 0000 0000 0000 0000 0000 0000 0000'
+  key: string = ''
 
   mounted() {
     this.modal = this.$refs.modal as Modal
@@ -56,6 +58,9 @@ export default class Setup2FAModal extends Vue {
   }
 
   public start() {
+    this.otp = ''
+    this.qrUrl = ''
+    this.key = 'Loading...'
     this.modal.open()
     API.prepare2FA()
       .then(res => {
@@ -70,7 +75,7 @@ export default class Setup2FAModal extends Vue {
       })
   }
 
-  onCodeSubmit() {
+  onCodeSubmit(done: () => void) {
     this.otp$v.$touch()
     if (!this.otp$v.$invalid) {
       verify2FA(this.otp)
@@ -80,6 +85,7 @@ export default class Setup2FAModal extends Vue {
           this.$emit('success')
         })
         .catch(err => this.notification.notify('Invalid One-Time-Password. Please try again.', false, 2500))
+        .finally(done)
     }
   }
 }
@@ -91,12 +97,15 @@ export default class Setup2FAModal extends Vue {
 .setup-2fa {
   text-align: center;
   .qr-code {
+    background-color: #00000011;
+    margin: 0 auto;
     width: 12rem;
     height: 12rem;
   }
   .key {
     font-family: monospace;
     font-weight: bold;
+    font-size: 1.3rem;
   }
   .modal main {
     padding-bottom: $m3;

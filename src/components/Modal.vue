@@ -9,7 +9,7 @@
         <slot></slot>
       </main>
       <footer v-if="showFooter">
-        <NavButton @click="show = false">Close</NavButton>
+        <NavButton @click-load="(done) => { done(); show = false }">{{ closeText }}</NavButton>
       </footer>
     </div>
   </div>
@@ -25,6 +25,7 @@ import NavButton from '@/components/NavButton.vue'
 })
 export default class Modal extends Vue {
   @Prop() title!: string
+  @Prop({ default: 'Close' }) closeText!: string
   @Prop({ default: true }) showHeader!: boolean
   @Prop({ default: true }) showFooter!: boolean
 
