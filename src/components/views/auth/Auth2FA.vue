@@ -1,5 +1,5 @@
 <template>
-<Modal ref="modal" class="auth-2fa" title="Two-Factor Authentication">
+<Modal ref="modal" class="centered" title="Two-Factor Authentication">
   <form>
     <p>Please enter a One-Time-Password from your registered authenticator application.</p>
 
@@ -54,9 +54,3 @@ export default class Auth2FA extends Vue {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.auth-2fa {
-  text-align: center;
-}
-</style>

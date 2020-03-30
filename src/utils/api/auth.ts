@@ -85,9 +85,6 @@ export function isLoggedIn(): Promise<Boolean> {
         const expiresIn: string | null = localStorage.getItem(LCL_EXPIRES)
         resolve(_2fa && !!expiresIn && parseInt(expiresIn) > Date.now())
       })
-      .catch(err => {
-        console.warn(err)
-        resolve(false)
-      })
+      .catch(_ => resolve(false))
   })
 }

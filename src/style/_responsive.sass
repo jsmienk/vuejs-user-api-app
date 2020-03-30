@@ -1,0 +1,60 @@
+@use 'src/style/spacing'
+
+// breakpoints
+$size-0: 0
+$size-1: 400px
+$size-2: 700px
+$size-3: 1000px
+$size-4: 1400px
+
+$break-0: 'screen and (min-width: #{$size-0})'
+$break-1: 'screen and (min-width: #{$size-1})'
+$break-2: 'screen and (min-width: #{$size-2})'
+$break-3: 'screen and (min-width: #{$size-3})'
+$break-4: 'screen and (min-width: #{$size-4})'
+
+@media #{$break-0}
+  // Pages
+  main
+    margin: 0 auto
+    width: 100%
+    padding: spacing.$m3
+
+    &.fullscreen
+    height: 100vh
+
+    form
+      .form-spacing
+        margin-top: spacing.$m2
+  
+  // Modals
+  .modal
+    width: 100%
+    margin: spacing.$m3
+
+    header, footer
+      padding: spacing.$m1 spacing.$m3
+    
+    main
+      height: 60vh
+      max-height: 500px
+      padding: 0 spacing.$m3
+
+@media #{$break-1}
+  main
+    &.slim
+      width: 400px
+
+@media #{$break-2}
+  // Pages
+  main
+    width: 600px
+
+  // Modals
+  .modal
+    width: 600px
+
+@media #{$break-3}
+  
+
+@media #{$break-4}

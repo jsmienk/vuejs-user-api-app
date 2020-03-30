@@ -1,0 +1,25 @@
+@use 'src/style/text'
+@use 'src/style/colors'
+@use 'src/style/spacing'
+@use 'src/style/responsive'
+
+$border-radius: .3rem
+$separator: 1px solid colors.$border
+
+
+#app
+  font-family: 'Avenir', Helvetica, Arial, sans-serif
+  -webkit-font-smoothing: antialiased
+  -moz-osx-font-smoothing: grayscale
+  color: colors.$text
+
+.button-row
+  display: flex
+  flex-direction: row
+  justify-content: space-between
+
+  .button
+    margin-right: spacing.$m2
+
+    &:last-child
+      margin-right: 0

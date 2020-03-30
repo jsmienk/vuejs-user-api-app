@@ -5,8 +5,8 @@ Vue.use(VueRouter)
 
 import { requireAuth } from '@/utils/api/auth'
 import Main from '@/components/views/Main.vue'
-import Account from '@/components/views/Account.vue'
-import Register from '@/components/auth/Register.vue'
+import Account from '@/components/views/auth/Account.vue'
+import Register from '@/components/views/auth/Register.vue'
 import ErrorPage from '@/components/views/Error.vue'
 
 

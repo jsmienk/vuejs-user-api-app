@@ -8,7 +8,7 @@
 
   <!-- 2FA -->
   <h3>Two-factor authentication (2FA)</h3>
-  <p>2FA is <span class="_2fa-enabled" :class="{ enabled: user.use2FA }">{{ user.use2FA ? 'enabled' : 'disabled' }}.</span></p>
+  <p>2FA is <span class="highlight" :class="{ negative: !user.use2FA }">{{ user.use2FA ? 'enabled' : 'disabled' }}.</span></p>
   <!-- Enable/disable -->
   <div class="button-row">
     <NavButton @click-load="viewCodes" v-if="user.use2FA">Show recovery codes</NavButton>
@@ -39,6 +39,7 @@
     <NavButton @click-load="revokeSession($event, session.hash)" class="button-warn session-revoke">Revoke</NavButton>
   </div>
 
+  <!-- Setup 2FA modal -->
   <Setup2FAModal ref="setup2FAModal" @success="user.use2FA = true" />
   <Notification ref="notification" />
 </main>
@@ -55,13 +56,17 @@ import { Actions } from '@/utils/store'
 import { disable2FA } from '@/utils/api/auth'
 
 import NavButton from '@/components/NavButton.vue'
-import Setup2FAModal from '@/components/auth/Setup2FA.vue'
-import Notification from '@/components/Notification.vue'
+import Setup2FAModal from '@/components/views/auth/Setup2FA.vue'
+import Notification, { Duration } from '@/components/Notification.vue'
 
 @Component({
   components: { NavButton, Setup2FAModal, Notification }
 })
 export default class Account extends Vue {
+  $refs!: {
+    notification: Notification,
+    setup2FAModal: Setup2FAModal
+  }
   // Default player while loading
   user: User = {
     _id: '',
@@ -74,10 +79,8 @@ export default class Account extends Vue {
   }
   sessions: DeviceSession[] | null = null
   sessionsError: string = ''
-  notification!: Notification
 
   mounted() {
-    this.notification = (this.$refs.notification as Notification)
     // Set user id from path parameter
     this.user._id = getAuthUserId() || ''
 
@@ -128,9 +131,9 @@ export default class Account extends Vue {
       .then(_ => {
         // Update UI
         this.user.use2FA = false
-        this.notification.notify('2FA disabled!')
+        this.$refs.notification.notify('2FA disabled!', true, Duration.SHORT)
       })
-      .catch(err => this.notification.notify(err.message, false))
+      .catch(err => this.$refs.notification.notify(err.message, false))
       .finally(done)
   }
 
@@ -138,8 +141,7 @@ export default class Account extends Vue {
    * Enable 2FA via API
    */
   enable2FA(done: () => void): void {
-    const modal = (this.$refs.setup2FAModal as Setup2FAModal)
-    modal.start()
+    this.$refs.setup2FAModal.start()
     done()
   }
 
@@ -157,8 +159,11 @@ export default class Account extends Vue {
    */
   revokeSession(done: () => void, hash: string): void {
     API.revokeSession(hash)
-      .then(this.getSessions)
-      .catch(err => this.sessionsError = 'Failed to delete session: ' + err.message)
+      .then(_ => {
+        this.getSessions()
+        this.$refs.notification.notify('Session revoked!', true, Duration.SHORT)
+      })
+      .catch(err => this.$refs.notification.notify('Failed to delete session: ' + err.message, false))
       .finally(done)
   }
 
@@ -173,80 +178,70 @@ export default class Account extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
-@import '../../style/colors';
-@import '../../style/vars';
+<style lang="sass" scoped>
+@use 'src/style'
+@use 'src/style/colors'
+@use 'src/style/spacing'
+@use 'src/style/responsive'
 
-#account {
-  ._2fa-enabled {
-    font-weight: bold;
-    color: red;
-    &.enabled {
-      color: green;
-    }
-  }
-  .device-session {
-    margin-bottom: 1rem;
-    padding: $m1 $m2;
-    border-radius: .3rem;
-    background-color: #fafafa;
-    box-shadow: 0 .2rem .5rem #00000022;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: flex-end;
-    .info {
-      width: 100%;
-      display: flex;
-      justify-content: flex-start;
-      align-items: self-start;
-      .icon {
-        width: 3rem;
-        display: none;
-        margin: $m2 $m2 0 0;
-      }
-      .details {
-        .device {
-          margin: 0;
-        }
-        .ip, .expires {
-          font-family: monospace;
-          margin-top: $m1;
-        }
-        .location {
-          border-top: 1px solid #00000033;
-          font-size: .9rem;
-        }
-      }
-    }
-    .session-revoke {
-      flex-shrink: 0;
-      width: initial;
-      margin-top: $m0;
-    }
-  }
-}
+#account
+  .device-session
+    margin-bottom: 1rem
+    padding: spacing.$m1 spacing.$m2
+    border-radius: style.$border-radius
+    background-color: #fafafa
+    box-shadow: 0 .2rem .5rem #00000022
+    display: flex
+    flex-direction: column
+    justify-content: space-between
+    align-items: flex-end
 
-@media screen and (min-width: $screen-size-1) {
-  #account {
-    .device-session {
-      .info {
-        .icon {
-          display: inline-block;
-        }
-      }
-    }
-  }
-}
+    .info
+      width: 100%
+      display: flex
+      justify-content: flex-start
+      align-items: self-start
 
-@media screen and (min-width: $screen-size-2) {
-  #account {
-    .device-session {
-      flex-direction: row;
-      .info {
-        margin-right: $m2;
-      }
-    }
-  }
-}
+      .icon
+        width: 3rem
+        margin: spacing.$m2 spacing.$m2 0 0
+
+      .details
+        .device
+          margin: 0
+
+        .ip, .expires
+          font-family: monospace
+          margin-top: spacing.$m1
+
+        .location 
+          border-top: 1px solid colors.$border
+          font-size: .9rem
+
+    .session-revoke 
+      flex-shrink: 0
+      width: initial
+      margin-top: spacing.$m0
+
+@media #{responsive.$break-0}
+  #account
+    .device-session
+      .info
+        .icon
+          display: none
+
+@media #{responsive.$break-1}
+  #account
+    .device-session
+      .info
+        .icon
+          display: inline-block
+
+@media #{responsive.$break-2}
+  #account
+    .device-session
+      flex-direction: row
+
+      .info
+        margin-right: spacing.$m2
 </style>

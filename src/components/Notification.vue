@@ -14,46 +14,52 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 
 import Modal from '@/components/Modal.vue'
 
+export enum Duration {
+  SHORT=1500,
+  NORMAL=2500,
+  LONG=2500
+}
+
 @Component({
   components: { Modal }
 })
 export default class Notification extends Vue {
+  @Prop({ default: Duration.NORMAL }) duration!: number
+
+  $refs!: { modal: Modal }
   text: string = 'Success'
   positive: boolean = true
-  handler: number | undefined = undefined
+  handler?: number
 
-  modal!: Modal
-
-  mounted() {
-    this.modal = this.$refs.modal as Modal
-  }
-
-  public notify(text: string, positive: boolean=true, duration: number=1500): void {
+  public notify(text: string, positive: boolean=true, duration?: Duration): void {
     this.text = text
     this.positive = positive
     // Open modal and close it after the duration
-    this.modal.open()
-    this.handler = setTimeout(this.close, duration)
+    this.$refs.modal.open()
+    this.handler = window.setTimeout(this.close, duration || this.duration)
   }
 
   close() {
     window.clearTimeout(this.handler)
-    this.modal.close()
+    this.$refs.modal.close()
   }
 }
 </script>
 
-<style lang="scss">
-.notification {
-  .modal {
-    text-align: center;
-    width: 20rem;
-    main {
-      height: initial;
-    }
-    .icon {
-      width: 50%;
-    }
-  }
-}
+<style lang="sass">
+@use 'src/style/colors'
+
+.notification
+  .modal
+    text-align: center
+    width: 20rem
+
+    main
+      width: 100%
+      overflow: hidden
+      height: initial
+
+    .icon 
+      width: 6rem
+      height: 6rem
 </style>

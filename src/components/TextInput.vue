@@ -10,7 +10,8 @@
       :type="type"
       :placeholder="placeholderText"
       :class="{ 'show-strength': checkStrength }"
-      @input="onInput" />
+      @input="onInput"
+      :autocomplete="autocomplete" />
 
     <!-- Code input -->
     <input v-if="type === InputType.CODE"
@@ -19,7 +20,8 @@
       minlength="6"
       maxlength="7"
       class="type-code"
-      @input="onInput" />
+      @input="onInput"
+      autocomplete="one-time-code" />
 
     <!-- Password strength bar -->
     <div v-if="checkStrength" class="password-strength">
@@ -52,7 +54,8 @@ export default class TextInput extends Mixins(validationMixin) {
   @Prop()                 type!: InputType
   @Prop()                 required!: boolean
   @Prop({default: .15})   passwordStrength!: number
-  @Prop({default: false}) checkStrength!: boolean    
+  @Prop({default: false}) checkStrength!: boolean
+  @Prop() autocomplete!: string
 
   other: string = ''
   code: string = ''
@@ -87,8 +90,8 @@ export default class TextInput extends Mixins(validationMixin) {
 
   getPasswordStrengthStyle(): string {
     return `
-      width: ${Math.min(Math.max(0, this.passwordStrength), 1)*100}%;
-      background-color: ${this.getPasswordStrengthColor(this.passwordStrength)};
+      width: ${Math.min(Math.max(0, this.passwordStrength), 1)*100}%
+      background-color: ${this.getPasswordStrengthColor(this.passwordStrength)}
     `
   }
 
@@ -100,93 +103,75 @@ export default class TextInput extends Mixins(validationMixin) {
 }
 </script>
 
-<style lang="scss" scoped>
-@import '../style/colors';
+<style lang="sass" scoped>
+@use 'src/style'
+@use 'src/style/colors'
 
-$border-radius: 4px;
+.text-input
+  border-radius: style.$border-radius
+  box-shadow: 0 0 1px #bbb
 
-.text-input {
-  border-radius: $border-radius;
-  box-shadow: 0 0 1px #bbb;
+  label, input
+    display: block
+    width: 100%
+    color: colors.$text
+    text-align: initial
 
-  label, input {
-    display: block;
-    width: 100%;
-    color: $color-text;
-    text-align: initial;
-  }
+  label
+    font-size: .9em
+    padding: 1px 8px 0
+    border-radius: style.$border-radius style.$border-radius 0 0
+    background-color: colors.$border
 
-  label {
-    font-size: .9em;
-    padding: 1px 8px 0;
-    border-radius: $border-radius $border-radius 0 0;
-    background-color: $color-input-border;
-  }
+  input
+    outline: none  // prevents browser's default focus indication
+    padding: 4px 8px
+    border-radius: 0 0 style.$border-radius style.$border-radius
+    background-color: colors.$background
 
-  input {
-    outline: none;  // prevents browser's default focus indication
-    padding: 4px 8px;
-    border-radius: 0 0 $border-radius $border-radius;
-    background-color: $color-bkg-light;
+    &.type-code
+      font-size: 1.1rem
+      text-align: center
+      letter-spacing: .5rem
 
-    &.type-code {
-      font-size: 1.1rem;
-      text-align: center;
-      letter-spacing: .8rem;
-    }
+    &.show-strength
+      border-radius: 0
 
-    &.show-strength {
-      border-radius: 0;
-    }
+    &::placeholder
+      color: colors.$text-warn
 
-    &::placeholder {
-      color: red;
-    }
-  }
+  input, .password-strength
+    border: 1px solid colors.$border
 
-  input, .password-strength {
-    border: 1px solid $color-input-border;
-  }
+  .password-strength
+    height: 6px
+    border-radius: 0 0 style.$border-radius style.$border-radius
+    border-top: none
+    overflow: hidden
 
-  .password-strength {
-    height: 6px;
-    border-radius: 0 0 $border-radius $border-radius;
-    border-top: none;
-    overflow: hidden;
+    .password-strength-bar
+      height: 100%
 
-    .password-strength-bar {
-      height: 100%;
-    }
-  }
+  &:focus-within
+    // box-shadow: 0 0 3px 1px #2299ff   LOOKS LIKE MACOS DEFAULT
+    box-shadow: 0 0 3px 1px #2299ff88
 
-  &:focus-within {
-    // box-shadow: 0 0 3px 1px #2299ff; LOOKS LIKE MACOS DEFAULT
-    box-shadow: 0 0 3px 1px #2299ff88;
-  }
+  &.text-input--error
+    animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both
+    transform: translate3d(0, 0, 0)
+    backface-visibility: hidden
+    perspective: 1000px
 
-  &.text-input--error {
-    animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
-    transform: translate3d(0, 0, 0);
-    backface-visibility: hidden;
-    perspective: 1000px;
-  }
-}
-
-@keyframes shake {
-  10%, 90% {
-    transform: translate3d(-1px, 0, 0);
-  }
+@keyframes shake
+  10%, 90%
+    transform: translate3d(-1px, 0, 0)
   
-  20%, 80% {
-    transform: translate3d(2px, 0, 0);
-  }
+  20%, 80% 
+    transform: translate3d(2px, 0, 0)
 
-  30%, 50%, 70% {
-    transform: translate3d(-4px, 0, 0);
-  }
+  30%, 50%, 70%
+    transform: translate3d(-4px, 0, 0)
 
-  40%, 60% {
-    transform: translate3d(4px, 0, 0);
-  }
-}
+  40%, 60%
+    transform: translate3d(4px, 0, 0)
 </style>

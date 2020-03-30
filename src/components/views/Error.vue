@@ -1,11 +1,11 @@
 <template>
-<div class="error-page">
+<main class="error-page fullscreen centered">
     <div class="error-head">
         <span class="error-status">{{ code }}</span>
         <span class="error-title">{{ title }}</span>
     </div>
     <p class="error-message">{{ message }}</p>
-</div>
+</main>
 </template>
 
 <script lang="ts">
@@ -19,35 +19,28 @@ export default class Error extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
-@import '../../style/colors';
+<style lang="sass" scoped>
+@use 'src/style/colors'
 
-.error-page {
-    text-align: center;
+.error-page
+  .error-head
+    position: relative
+    margin-top: 100px
 
-    .error-head {
-        position: relative;
-        margin-top: 100px;
+    .error-status
+      line-height: 1.2
+      font-size: 24vw
+      font-weight: bold
+      color: colors.$error-code
 
-        .error-status {
-            line-height: 1.2;
-            font-size: 24vw;
-            font-weight: bold;
-            color: $color-error-code;
-        }
+    .error-title
+      position: absolute
+      top: 55%
+      left: 20%
+      font-size: 8vw
+      font-weight: bold
 
-        .error-title {
-            position: absolute;
-            top: 55%;
-            left: 20%;
-            font-size: 8vw;
-            font-weight: bold;
-        }
-    }
-
-    .error-message {
-        display: inline-block;
-        max-width: 80%;
-    }
-}
+  .error-message
+    display: inline-block
+    max-width: 80%
 </style>

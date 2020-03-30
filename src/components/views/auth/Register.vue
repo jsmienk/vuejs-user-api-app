@@ -1,5 +1,5 @@
 <template>
-<main id="register" class="fullscreen">
+<main id="register" class="slim fullscreen centered">
   <h1>Register</h1>
   <!-- Instructions -->
   <p class="instructions">Register using a unique email address, a display name, and a strong password.</p>
@@ -7,13 +7,13 @@
   <form>
     <!-- Email (unique) -->
     <TextInput class="form-spacing" label="Email address" type="email"
-      @input="email = $event" @link="email$v = $event" required />
+      @input="email = $event" @link="email$v = $event" autocomplete="email" required />
     <!-- Name (display) -->
     <TextInput class="form-spacing" label="Name" type="text"
-      @input="dname = $event" @link="dname$v = $event" required />
+      @input="dname = $event" @link="dname$v = $event" autocomplete="username" required />
     <!-- Password (min. length) -->
     <TextInput class="form-spacing" label="Password" type="password" :checkStrength="true"
-      @input="passw = $event" @link="passw$v = $event" required />
+      @input="passw = $event" @link="passw$v = $event" autocomplete="new-password" required />
 
     <div class="button-row form-spacing">
       <NavButton :to="Pages.MAIN" :active="true">Login</NavButton>
@@ -21,8 +21,7 @@
     </div>
   </form>
 
-  <!-- Register error modal -->
-  <ErrorModal :error="error" />
+  <Notification ref="notification" />
 </main>
 </template>
 
@@ -35,20 +34,19 @@ import API from '@/utils/api'
 
 import TextInput from '@/components/TextInput.vue'
 import NavButton from '@/components/NavButton.vue'
-import ErrorModal, { Error } from '@/components/ErrorModal.vue'
+import Notification from '@/components/Notification.vue'
 
 @Component({
-  components: { TextInput, NavButton, ErrorModal }
+  components: { TextInput, NavButton, Notification }
 })
 export default class Register extends Vue {
+  $refs!: { notification: Notification }
   email: string = ''
   dname: string = ''
   passw: string = ''
   email$v!: Validation
   dname$v!: Validation
   passw$v!: Validation
-
-  error: Error = { title: '', message: '' }
 
   data() { return { Pages } }
 
@@ -64,31 +62,16 @@ export default class Register extends Vue {
         .catch(err => {
           switch (err.code) {
             case 400:
-              this.error = {
-                title: 'Register Error',
-                message: 'Invalid email or display name provided!'
-              }
+              this.$refs.notification.notify('Invalid email or display name provided!', false)
               break
             case 409:
-              this.error = {
-                title: 'Duplicate Email',
-                message: 'This email address is already in use. Login or try to register with a different email address!'
-              }
+              this.$refs.notification.notify('This email address is already in use. Login or try to register with a different email address!', false)
               break
           }
         })
         .finally(done)
-    }
+    } else done()
     return false
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import '../../style/colors';
-@import '../../style/vars';
-
-#register {
-  text-align: center;
-}
-</style>

@@ -1,6 +1,6 @@
 <template>
 <div>
-  <Modal ref="modal" class="setup-2fa" title="Two-Factor Authentication" close-text="Cancel">
+  <Modal id="setup-2fa" ref="modal" class="centered" title="Two-Factor Authentication" close-text="Cancel">
     <!-- Instructions -->
     <p>To enable 2FA, follow these steps:</p>
     <p>1. Open any authenticator application (e.g. Authy and Google Authenticator).</p>
@@ -45,23 +45,20 @@ import Notification from '@/components/Notification.vue'
   components: { Modal, TextInput, NavButton, Notification }
 })
 export default class Setup2FAModal extends Vue {
-  modal!: Modal
-  notification!: Notification
+  $refs!: {
+    modal: Modal
+    notification: Notification
+  }
   otp: string = ''
   otp$v!: Validation
   qrUrl: string = ''
   key: string = ''
 
-  mounted() {
-    this.modal = this.$refs.modal as Modal
-    this.notification = this.$refs.notification as Notification
-  }
-
   public start() {
     this.otp = ''
     this.qrUrl = ''
     this.key = 'Loading...'
-    this.modal.open()
+    this.$refs.modal.open()
     API.prepare2FA()
       .then(res => {
         this.key = res.key2FA
@@ -70,8 +67,8 @@ export default class Setup2FAModal extends Vue {
           .catch(console.warn)
       })
       .catch(err => {
-        this.modal.close()
-        this.notification.notify('2FA cannot be enabled right now. Please try again later.', false, 3000)
+        this.$refs.modal.close()
+        this.$refs.notification.notify('2FA cannot be enabled right now. Please try again later.', false)
       })
   }
 
@@ -80,35 +77,32 @@ export default class Setup2FAModal extends Vue {
     if (!this.otp$v.$invalid) {
       verify2FA(this.otp)
         .then(user => {
-          this.notification.notify('2FA is successfully enabled!', true, 1500)
-          this.modal.close()
+          this.$refs.notification.notify('2FA is successfully enabled!', true, 1500)
+          this.$refs.modal.close()
           this.$emit('success')
         })
-        .catch(err => this.notification.notify('Invalid One-Time-Password. Please try again.', false, 2500))
+        .catch(err => this.$refs.notification.notify('Invalid One-Time-Password. Please try again.', false))
         .finally(done)
-    }
+    } else done()
   }
 }
 </script>
 
-<style lang="scss">
-@import "../../style/vars";
+<style lang="sass">
+@use 'src/style/spacing'
 
-.setup-2fa {
-  text-align: center;
-  .qr-code {
-    background-color: #00000011;
-    margin: 0 auto;
-    width: 12rem;
-    height: 12rem;
-  }
-  .key {
-    font-family: monospace;
-    font-weight: bold;
-    font-size: 1.3rem;
-  }
-  .modal main {
-    padding-bottom: $m3;
-  }
-}
+#setup-2fa
+  .qr-code
+    background-color: #00000011
+    margin: 0 auto
+    width: 12rem
+    height: 12rem
+
+  .key
+    font-family: monospace
+    font-weight: bold
+    font-size: 1.3rem
+
+  .modal main
+    padding-bottom: spacing.$m3
 </style>

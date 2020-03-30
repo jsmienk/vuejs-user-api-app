@@ -122,6 +122,37 @@ export default {
 
 // HELPERS
 
+export enum ErrorCodes {
+  // local
+  TIMEOUT       =0,   // Timeout
+  // API
+  OK            =200, // OK
+  CREATED       =201, // Created
+  NO_CONTENT    =204, // No Content
+
+  BAD_REQUEST   =400, // Bad Request
+  UNAUTHORIZED  =401, // Unauthorized
+  FORBIDDEN     =403, // Forbidden
+  NOT_FOUND     =404, // Not Found
+  CONFLICT      =409, // Conflict
+
+  UNKNOWN_ERROR =500  // Unknown server error
+}
+
 function handleResponse<T>(request: Promise<AxiosResponse<any>>): Promise<T> {
-  return new Promise((resolve, reject) => request.then(res => resolve(res.data)).catch(err => reject(err.response.data)))
+  return new Promise((resolve: (value: T) => void, reject: (reason: ErrorCodes) => void) => {
+    request
+      .then(res => resolve(res.data))
+      .catch(err => {
+        // No response = timeout
+        let errorCode = ErrorCodes.TIMEOUT
+        // If we got a response
+        if (!!err.response) {
+          // Check its error
+          console.warn(err.response.data.code + ' - ' + err.response.data.title + ': ' + err.response.data.message)
+          errorCode = err.response.data.code
+        } else console.error('Client timed out!')
+        reject(errorCode)
+      })
+  })
 }
