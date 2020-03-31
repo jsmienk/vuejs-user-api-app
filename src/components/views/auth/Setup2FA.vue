@@ -1,10 +1,11 @@
 <template>
 <div>
-  <Modal id="setup-2fa" ref="modal" class="centered" title="Two-Factor Authentication" close-text="Cancel">
+  <Modal id="setup-2fa" ref="modal" class="centered"
+    :title="$t('pages.setup2fa.title')" :close-text="$t('pages.setup2fa.close')">
     <!-- Instructions -->
-    <p>To enable 2FA, follow these steps:</p>
-    <p>1. Open any authenticator application (e.g. Authy and Google Authenticator).</p>
-    <p>2. Scan the QR-code or manually enter the key to register this service to the authenticator application.</p>
+    <p>{{ $t('pages.setup2fa.instruction.0') }}</p>
+    <p>{{ $t('pages.setup2fa.instruction.1') }}</p>
+    <p>{{ $t('pages.setup2fa.instruction.2') }}</p>
 
     <!-- QR code -->
     <div class="qr-code">
@@ -14,15 +15,15 @@
     <!-- Manual key -->
     <p class="key">{{ key }}</p>
 
-    <p>3. Confirm the registration by submitting the One-Time-Password.</p>
+    <p>{{ $t('pages.setup2fa.instruction.3') }}</p>
 
     <form>
       <!-- Input code -->
-      <TextInput type="code" label="One-Time-Password"
+      <TextInput type="code" :label="$t('pages.setup2fa.input.label.otp')"
         @input="otp = $event" @link="otp$v = $event" required />
 
       <!-- Submit button -->
-      <NavButton class="button-main form-spacing" @click-load="onCodeSubmit">Submit Code</NavButton>
+      <NavButton class="button-main form-spacing" @click-load="onCodeSubmit">{{ $t('pages.setup2fa.button.submit') }}</NavButton>
     </form>
   </Modal>
   <Notification ref="notification" />
@@ -33,7 +34,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import { Validation } from 'vuelidate'
 import QRCode from 'qrcode'
-import API from '@/utils/api'
+import API, { ErrorCodes } from '@/utils/api'
 import { verify2FA } from '@/utils/api/auth'
 
 import Modal from '@/components/Modal.vue'
@@ -57,7 +58,7 @@ export default class Setup2FAModal extends Vue {
   public start() {
     this.otp = ''
     this.qrUrl = ''
-    this.key = 'Loading...'
+    this.key = this.$t('loading') as string
     this.$refs.modal.open()
     API.prepare2FA()
       .then(res => {
@@ -66,9 +67,9 @@ export default class Setup2FAModal extends Vue {
           .then((url: string) => this.qrUrl = url)
           .catch(console.warn)
       })
-      .catch(err => {
+      .catch((code: ErrorCodes) => {
         this.$refs.modal.close()
-        this.$refs.notification.notify('2FA cannot be enabled right now. Please try again later.', false)
+        this.$refs.notification.notify('pages.setup2fa.notification.fail', false)
       })
   }
 
@@ -77,11 +78,19 @@ export default class Setup2FAModal extends Vue {
     if (!this.otp$v.$invalid) {
       verify2FA(this.otp)
         .then(user => {
-          this.$refs.notification.notify('2FA is successfully enabled!', true, 1500)
+          this.$refs.notification.notify('pages.setup2fa.notification.success', true, 1500)
           this.$refs.modal.close()
           this.$emit('success')
         })
-        .catch(err => this.$refs.notification.notify('Invalid One-Time-Password. Please try again.', false))
+        .catch((code: ErrorCodes) => {
+          switch (code) {
+            case ErrorCodes.TIMEOUT:
+              return this.$refs.notification.notify('error.api.timeout', false)
+            case ErrorCodes.UNAUTHORIZED:
+              return this.$refs.notification.notify('error.api.invalid_otp', false)
+          }
+          return this.$refs.notification.notify('error.api.unknown', false)
+        })
         .finally(done)
     } else done()
   }

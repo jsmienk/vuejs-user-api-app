@@ -55,7 +55,7 @@ export default class TextInput extends Mixins(validationMixin) {
   @Prop()                 required!: boolean
   @Prop({default: .15})   passwordStrength!: number
   @Prop({default: false}) checkStrength!: boolean
-  @Prop() autocomplete!: string
+  @Prop()                 autocomplete!: string
 
   other: string = ''
   code: string = ''
@@ -77,7 +77,7 @@ export default class TextInput extends Mixins(validationMixin) {
   }
 
   get placeholderText(): string {
-    return this.isError ? 'Please fill in this field' : ''
+    return this.isError ? this.$t('error.input.required') as string : ''
   }
 
   mounted() {

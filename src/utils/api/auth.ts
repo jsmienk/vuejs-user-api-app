@@ -1,4 +1,4 @@
-import API, { AuthenticationResponse } from '.'
+import API, { AuthenticationResponse, APIError } from '.'
 import { User } from './models'
 import Store, { Actions, Commits } from '@/utils/store'
 
@@ -9,7 +9,7 @@ const LCL_PASS2FA = '_2fa'
 // API CALLS
 
 export function login(email: string, password: string): Promise<User> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject: APIError) => {
     API.login(email, password)
       .then(res => saveLoginDetails(res, resolve))
       .catch(reject)
@@ -17,7 +17,7 @@ export function login(email: string, password: string): Promise<User> {
 }
 
 export function verify2FA(token: string): Promise<User> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject: APIError) => {
     API.verify2FA(token)
       .then(res => saveLoginDetails(res, resolve))
       .catch(reject)
@@ -25,7 +25,7 @@ export function verify2FA(token: string): Promise<User> {
 }
 
 export function disable2FA(): Promise<User> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject: APIError) => {
     API.disable2FA()
       .then(_ => {
         localStorage.setItem(LCL_PASS2FA, 'false')
@@ -49,9 +49,7 @@ export function getAuthUserId(): string | null {
 }
 
 export function logout(): void {
-  API.logout()
-    .then(clearStorage)
-    .catch(clearStorage)
+  API.logout().finally(clearStorage)
 }
 
 function clearStorage(): void {

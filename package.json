@@ -20,6 +20,7 @@
     "sanitize.css": "^11.0.0",
     "socket.io-client": "^2.3.0",
     "vue": "^2.6.10",
+    "vue-i18n": "^8.16.0",
     "vue-property-decorator": "^8.4.0",
     "vue-router": "^3.0.3",
     "vuelidate": "^0.7.5",

@@ -139,8 +139,12 @@ export enum ErrorCodes {
   UNKNOWN_ERROR =500  // Unknown server error
 }
 
+export interface APIError {
+  (reason: ErrorCodes): void
+}
+
 function handleResponse<T>(request: Promise<AxiosResponse<any>>): Promise<T> {
-  return new Promise((resolve: (value: T) => void, reject: (reason: ErrorCodes) => void) => {
+  return new Promise((resolve: (value: T) => void, reject: APIError) => {
     request
       .then(res => resolve(res.data))
       .catch(err => {

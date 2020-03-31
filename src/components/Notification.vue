@@ -1,7 +1,7 @@
 <template>
 <Modal ref="modal" class="notification" :show-footer="false" :show-header="false">
   <div @click="close">
-    <h4>Notification</h4>
+    <h4>{{ $t('notification.title') }}</h4>
     <img v-if="positive" src="@/assets/noti_pos.svg" class="icon" />
     <img v-if="!positive" src="@/assets/noti_neg.svg" class="icon" />
     <p>{{ text }}</p>
@@ -27,12 +27,13 @@ export default class Notification extends Vue {
   @Prop({ default: Duration.NORMAL }) duration!: number
 
   $refs!: { modal: Modal }
-  text: string = 'Success'
+  text: string = ''
   positive: boolean = true
   handler?: number
 
   public notify(text: string, positive: boolean=true, duration?: Duration): void {
-    this.text = text
+    // Try to use the text as a localization key
+    this.text = (this.$te(text) ? this.$t(text) as string : text) || this.$t('notification.msg_default') as string
     this.positive = positive
     // Open modal and close it after the duration
     this.$refs.modal.open()

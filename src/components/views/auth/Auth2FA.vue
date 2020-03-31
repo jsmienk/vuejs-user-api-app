@@ -1,12 +1,12 @@
 <template>
-<Modal ref="modal" class="centered" title="Two-Factor Authentication">
+<Modal ref="modal" class="centered" :title="$t('pages.auth2fa.title')">
   <form>
-    <p>Please enter a One-Time-Password from your registered authenticator application.</p>
+    <p>{{ $t('pages.auth2fa.instructions') }}</p>
 
-    <TextInput type="code" label="One-Time-Password"
+    <TextInput type="code" :label="$t('pages.auth2fa.input.label.otp')"
       @input="otp = $event" @link="otp$v = $event" required />
 
-    <NavButton class="button-main form-spacing" @click-load="onCodeSubmit">Submit Code</NavButton>
+    <NavButton class="button-main form-spacing" @click-load="onCodeSubmit">{{ $t('pages.auth2fa.button.submit') }}</NavButton>
 
     <p class="text-error">{{ errorText }}</p>
   </form>
@@ -26,6 +26,7 @@ import NavButton from '@/components/NavButton.vue'
   components: { Modal, TextInput, NavButton }
 })
 export default class Auth2FA extends Vue {
+  $refs!: { modal: Modal }
   otp: string = ''
   badOTP: boolean = false
   otp$v!: Validation
@@ -36,7 +37,7 @@ export default class Auth2FA extends Vue {
     this.otp$v.$reset()
     this.otp = ''
     this.errorText = ''
-    ;(this.$refs.modal as Modal).open()
+    this.$refs.modal.open()
   }
 
   onCodeSubmit(done: () => void) {
@@ -45,11 +46,11 @@ export default class Auth2FA extends Vue {
     if (!this.otp$v.$invalid) {
       verify2FA(this.otp)
         .then(user => this.$emit('success', user))
-        .catch(err => this.errorText = 'Invalid One-Time-Password. Please try again.')
+        .catch(err => this.errorText = this.$t('error.api.invalid_otp') as string)
         .finally(done)
     } else {
       done()
-      this.errorText = 'One-Time-Password consists of 6 or 7 digits.'
+      this.errorText = this.$t('pages.auth2fa.error.otp_length') as string
     }
   }
 }

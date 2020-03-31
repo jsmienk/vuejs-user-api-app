@@ -1,25 +1,25 @@
 <template>
 <main id="login" class="slim fullscreen centered">
-  <h1>Login</h1>
+  <h1>{{ $t('pages.login.title') }}</h1>
   <div class="login-card">
     <!-- Instructions -->
-    <p class="instructions">Login using your registered email address, and password.</p>
+    <p class="instructions">{{ $t('pages.login.instructions') }}</p>
     <!-- Login form -->
     <form>
       <!-- Email -->
-      <TextInput label="Email address" type="email" autocomplete="email"
+      <TextInput :label="$t('pages.login.input.label.email')" type="email" autocomplete="email"
         @input="email = $event" @link="email$v = $event" required />
       <!-- Password -->
-      <TextInput class="form-spacing" label="Password" type="password" autocomplete="current-password"
+      <TextInput class="form-spacing" :label="$t('pages.login.input.label.password')" type="password" autocomplete="current-password"
         @input="passw = $event" @link="passw$v = $event" required />
 
       <div class="button-row form-spacing">
-        <NavButton :to="Pages.REGISTER" :active="true">Register</NavButton>
-        <NavButton class="button-main" @click-load="onLoginClick">Login</NavButton>
+        <NavButton :to="Pages.REGISTER" :active="true">{{ $t('pages.login.button.go_register') }}</NavButton>
+        <NavButton class="button-main" @click-load="onLoginClick">{{ $t('pages.login.button.login') }}</NavButton>
       </div>
 
       <!-- Request password reset -->
-      <NavButton class="form-spacing" @click-load="onForgotPasswordClick">Forgot password?</NavButton>
+      <NavButton class="form-spacing" @click-load="onForgotPasswordClick">{{ $t('pages.login.input.label.password') }}</NavButton>
     </form>
   </div>
 
@@ -33,6 +33,7 @@
 import { Vue, Component } from 'vue-property-decorator'
 import { Validation } from 'vuelidate'
 import { Pages, PageRoutes } from '@/utils/router'
+import { ErrorCodes } from '@/utils/api'
 import { login, getAuthUserId } from '@/utils/api/auth'
 
 import TextInput from '@/components/TextInput.vue'
@@ -71,15 +72,14 @@ export default class Main extends Vue {
             // Go to account
             this.goToAccount()
         })
-        .catch(err => {
-          switch(err.code) {
-            case 0:
-              this.$refs.notification.notify('Could not load response in time!', false)
-              break
-            case 401:
-              this.$refs.notification.notify('Invalid credentials provided!', false)
-              break
+        .catch((code: ErrorCodes) => {
+          switch(code) {
+            case ErrorCodes.TIMEOUT:
+              return this.$refs.notification.notify('error.api.timeout', false)
+            case ErrorCodes.UNAUTHORIZED:
+              return this.$refs.notification.notify('error.api.invalid_login', false)
           }
+          return this.$refs.notification.notify('error.api.unknown', false)
         })
         .finally(done)
     } else done()

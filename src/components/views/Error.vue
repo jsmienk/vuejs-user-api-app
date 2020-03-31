@@ -14,8 +14,13 @@ import { Vue, Component } from 'vue-property-decorator'
 @Component
 export default class Error extends Vue {
     code: number = 404
-    title: string = 'Page Not Found'
-    message: string = 'This page could not be found. The page may have moved, or we redirected you wrongly, or the URL was spelled wrongly.'
+    
+    data() {
+      return {
+        title: this.$t('pages.error.404.title'),
+        message: this.$t('pages.error.404.message')
+      }
+    }
 }
 </script>
 
@@ -23,6 +28,8 @@ export default class Error extends Vue {
 @use 'src/style/colors'
 
 .error-page
+  width: 100%
+
   .error-head
     position: relative
     margin-top: 100px
