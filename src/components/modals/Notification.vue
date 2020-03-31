@@ -1,7 +1,7 @@
 <template>
 <Modal ref="modal" class="notification" :show-footer="false" :show-header="false">
   <div @click="close">
-    <h4>{{ $t('notification.title') }}</h4>
+    <h4 v-t="'notification.title'" />
     <img v-if="positive" src="@/assets/noti_pos.svg" class="icon" />
     <img v-if="!positive" src="@/assets/noti_neg.svg" class="icon" />
     <p>{{ text }}</p>
@@ -12,7 +12,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
 
-import Modal from '@/components/Modal.vue'
+import Modal from '@/components/modals/Modal.vue'
 
 export enum Duration {
   SHORT=1500,
@@ -48,8 +48,6 @@ export default class Notification extends Vue {
 </script>
 
 <style lang="sass">
-@use 'src/style/colors'
-
 .notification
   .modal
     text-align: center

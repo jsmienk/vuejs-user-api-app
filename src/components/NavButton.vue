@@ -5,8 +5,8 @@
     <router-link class="internal" v-if="active" :to="toRaw">
       <slot></slot>
     </router-link>
-    <a class="internal" :class="{ loading }" v-if="!active" href="#" @click="onClick">
-      <span v-if="loading">. . .</span>
+    <a class="internal" :class="{ loading }" v-if="!active" href="#" @click.prevent="onClick">
+      <span v-if="loading" v-t="'button_loading'" />
       <span v-if="!loading"><slot></slot></span>
     </a>
   </span>
@@ -17,7 +17,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 import { Pages, PageRoutes } from '@/utils/router'
 
 @Component
-export default class Register extends Vue {
+export default class NavButton extends Vue {
   @Prop() to!: Pages
   @Prop() args!: [any]
   @Prop() active!: boolean
@@ -41,13 +41,16 @@ export default class Register extends Vue {
 @use 'src/style/colors'
 
 .button
-  display: inline-block
+  display: inline-flex
+  align-items: center
   width: 100%
+  padding: 0
   background-color: colors.$btn-2nd
-  border-radius: style.$border-radius
+  border-radius: .3rem
   text-transform: uppercase
   text-align: center
   font-size: 1rem
+  word-break: normal
 
   .internal
     padding: .3rem 1.8rem
@@ -64,4 +67,18 @@ export default class Register extends Vue {
   &.button-warn
     background-color: colors.$btn-warn
     color: colors.$text-light
+  
+  &.button-small, &.button-tiny
+    width: initial
+    border-radius: .2rem
+
+  &.button-small
+    font-size: .9rem
+    .internal
+      padding: .2rem 1rem .1rem
+
+  &.button-tiny
+    font-size: .8rem
+    .internal
+      padding: .1rem 1rem 0
 </style>

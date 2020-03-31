@@ -76,7 +76,7 @@ $animation-flow: .3s ease
       margin: 0
   
   main
-    overflow-y: scroll
+    overflow-y: auto
 
   footer
     border-top: style.$separator

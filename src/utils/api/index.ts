@@ -1,6 +1,6 @@
 import Axios, { AxiosResponse } from 'axios'
 import Config from '@/config'
-import { User, DeviceSession } from './models'
+import { User, DeviceSession, AccountLog } from './models'
 import { getAuthUserId, logout } from './auth'
 
 
@@ -40,6 +40,10 @@ export interface UserCreatedResponse {
 
 export interface DeviceSessionsResponse {
   readonly sessions: DeviceSession[]
+}
+
+export interface AccountLogsResponse {
+  readonly logs: AccountLog[]
 }
 
 
@@ -116,6 +120,10 @@ export default {
 
   async revokeSession(hash: string): Promise<NoContentResponse> {
     return handleResponse(API.delete('/users/' + getAuthUserId() + '/sessions', { data: { hash } }))
+  },
+
+  async getAccountLogs(): Promise<AccountLogsResponse> {
+    return handleResponse(API.get('/users/' + getAuthUserId() + '/logs'))
   }
 }
 

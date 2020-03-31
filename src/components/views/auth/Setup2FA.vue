@@ -13,7 +13,7 @@
     </div>
 
     <!-- Manual key -->
-    <p class="key">{{ key }}</p>
+    <p class="key monospace">{{ key }}</p>
 
     <p>{{ $t('pages.setup2fa.instruction.3') }}</p>
 
@@ -31,16 +31,16 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
+import { Vue, Component } from 'vue-property-decorator'
 import { Validation } from 'vuelidate'
 import QRCode from 'qrcode'
 import API, { ErrorCodes } from '@/utils/api'
 import { verify2FA } from '@/utils/api/auth'
 
-import Modal from '@/components/Modal.vue'
+import Modal from '@/components/modals/Modal.vue'
 import TextInput from '@/components/TextInput.vue'
 import NavButton from '@/components/NavButton.vue'
-import Notification from '@/components/Notification.vue'
+import Notification from '@/components/modals/Notification.vue'
 
 @Component({
   components: { Modal, TextInput, NavButton, Notification }
@@ -55,7 +55,7 @@ export default class Setup2FAModal extends Vue {
   qrUrl: string = ''
   key: string = ''
 
-  public start() {
+  public open() {
     this.otp = ''
     this.qrUrl = ''
     this.key = this.$t('loading') as string
@@ -108,7 +108,6 @@ export default class Setup2FAModal extends Vue {
     height: 12rem
 
   .key
-    font-family: monospace
     font-weight: bold
     font-size: 1.3rem
 

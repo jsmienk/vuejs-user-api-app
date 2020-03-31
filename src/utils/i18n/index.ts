@@ -10,6 +10,8 @@ export interface Localization extends LocaleMessageObject {
   // general
   app_name: string,
   loading: string,
+  button_loading: string,
+  unknown_location: string,
 
   // errors
   error: {
@@ -86,29 +88,47 @@ export interface Localization extends LocaleMessageObject {
     account: {
       heading: {
         _2fa: string,
-        sessions: string
+        sessions: string,
+        event_log: string,
+        deletion: string,
       },
       button: {
         logout: string,
         enable_2fa: string,
         disable_2fa: string,
         show_2fa_codes: string,
-        revoke_session: string
+        revoke_session: string,
+        show_event_log: string,
+        delete: string
       },
       text: {
         _2fa_status: string,
         _2fa_enabled: string,  // used in 1 sentence with '_2fa_status'
-        _2fa_disabled: string  // used in 1 sentence with '_2fa_status'
+        _2fa_disabled: string, // used in 1 sentence with '_2fa_status'
+        _2fa_info: string,
+        session_info: string,
+        event_log_info: string,
+        deletion_info: string
       },
       error: {
         no_sessions: string,
         fail_sessions: string,
         fail_revoke_session: string,
-        fail_disable_2fa: string
+        fail_disable_2fa: string,
+        fail_delete_account: string
       },
       notification: {
         _2fa_disabled: string,
-        session_revoked: string
+        session_revoked: string,
+        account_deleted: string
+      },
+      confirmation: {
+        delete: {
+          title: string,
+          question: string,
+          positive: string,
+          negative: string
+        }
       }
     },
 
@@ -136,6 +156,29 @@ export interface Localization extends LocaleMessageObject {
       }
     },
 
+    // account event logs
+    account_log: {
+      title: string,
+      info: string,
+      error: {
+        no_logs: string
+      },
+      type: {
+        1: string,
+        2: string,
+        3: string,
+        4: string,
+        5: string,
+        6: string,
+        7: string,
+        8: string,
+        9: string,
+        10: string,
+        11: string,
+        12: string
+      }
+    },
+
     // error
     error: {
       404: {
@@ -148,7 +191,16 @@ export interface Localization extends LocaleMessageObject {
   // notifications
   notification: {
     title: string,
-    msg_default: string
+    msg_default: string,
+    confirmation: {
+      title_default: string,
+      question_default: string,
+      button: {
+        positive: string,
+        neutral: string,
+        negative: string
+      }
+    }
   },
 
   // modals

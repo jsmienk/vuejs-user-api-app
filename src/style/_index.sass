@@ -13,13 +13,31 @@ $separator: 1px solid colors.$border
   -moz-osx-font-smoothing: grayscale
   color: colors.$text
 
+.card
+  padding: spacing.$m1 spacing.$m2
+  border-radius: $border-radius
+  background-color: #fafafa
+  box-shadow: 0 .2rem .5rem #00000022
+
 .button-row
   display: flex
+  flex-wrap: wrap
   flex-direction: row
   justify-content: space-between
+  margin-top: - spacing.$m2
+  margin-right: - spacing.$m2
 
   .button
+    margin-top: spacing.$m2
     margin-right: spacing.$m2
+    flex-grow: 1
+    width: initial
+    max-width: initial
+    &:first-child
+      margin-top: spacing.$m2
 
-    &:last-child
-      margin-right: 0
+  &.middle
+    margin-right: 0
+    .button
+      margin-left: spacing.$m1
+      margin-right: spacing.$m1

@@ -19,7 +19,7 @@
       </div>
 
       <!-- Request password reset -->
-      <NavButton class="form-spacing" @click-load="onForgotPasswordClick">{{ $t('pages.login.input.label.password') }}</NavButton>
+      <NavButton class="form-spacing" @click-load="onForgotPasswordClick">{{ $t('pages.login.button.forgot_pass') }}</NavButton>
     </form>
   </div>
 
@@ -38,7 +38,7 @@ import { login, getAuthUserId } from '@/utils/api/auth'
 
 import TextInput from '@/components/TextInput.vue'
 import NavButton from '@/components/NavButton.vue'
-import Notification from '@/components/Notification.vue'
+import Notification from '@/components/modals/Notification.vue'
 import Auth2FAModal from '@/components/views/auth/Auth2FA.vue'
 
 @Component({

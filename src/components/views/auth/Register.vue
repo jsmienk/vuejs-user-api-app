@@ -34,7 +34,7 @@ import API, { ErrorCodes } from '@/utils/api'
 
 import TextInput from '@/components/TextInput.vue'
 import NavButton from '@/components/NavButton.vue'
-import Notification, { Duration } from '@/components/Notification.vue'
+import Notification, { Duration } from '@/components/modals/Notification.vue'
 
 @Component({
   components: { TextInput, NavButton, Notification }

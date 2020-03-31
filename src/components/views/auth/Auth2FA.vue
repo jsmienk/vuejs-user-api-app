@@ -14,18 +14,18 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
+import { Vue, Component } from 'vue-property-decorator'
 import { Validation } from 'vuelidate'
 import { verify2FA } from '@/utils/api/auth'
 
-import Modal from '@/components/Modal.vue'
+import Modal from '@/components/modals/Modal.vue'
 import TextInput from '@/components/TextInput.vue'
 import NavButton from '@/components/NavButton.vue'
 
 @Component({
   components: { Modal, TextInput, NavButton }
 })
-export default class Auth2FA extends Vue {
+export default class Auth2FAModal extends Vue {
   $refs!: { modal: Modal }
   otp: string = ''
   badOTP: boolean = false
@@ -33,7 +33,7 @@ export default class Auth2FA extends Vue {
 
   errorText: string = ''
 
-  open() {
+  public open() {
     this.otp$v.$reset()
     this.otp = ''
     this.errorText = ''

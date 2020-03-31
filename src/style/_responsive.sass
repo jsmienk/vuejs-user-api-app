@@ -2,6 +2,7 @@
 
 // breakpoints
 $size-0: 0
+$size-small-phone: 350px
 $size-1: 400px
 $size-2: 700px
 $size-3: 1000px
@@ -13,12 +14,15 @@ $break-2: 'screen and (min-width: #{$size-2})'
 $break-3: 'screen and (min-width: #{$size-3})'
 $break-4: 'screen and (min-width: #{$size-4})'
 
+$break-small-phone: 'screen and (max-width: #{$size-small-phone})'
+
+/* DEFAULT RESPONSIVE CSS */
 @media #{$break-0}
   // Pages
   main
     margin: 0 auto
     width: 100%
-    padding: spacing.$m3
+    padding: spacing.$m3 spacing.$m3 spacing.$m4
 
     &.fullscreen
       height: 100vh
@@ -30,7 +34,7 @@ $break-4: 'screen and (min-width: #{$size-4})'
   // Modals
   .modal
     width: 100%
-    margin: spacing.$m3
+    margin: spacing.$m2
 
     header, footer
       padding: spacing.$m1 spacing.$m3
@@ -40,17 +44,29 @@ $break-4: 'screen and (min-width: #{$size-4})'
       max-height: 500px
       padding: 0 spacing.$m3
 
+
+
+/* RESPONSIVE CSS FOR THE SMALLEST PHONES */
+@media #{$break-small-phone}
+  main
+    padding: spacing.$m2 spacing.$m2 spacing.$m4
+
+
+
+/* RESPONSIVE CSS AFTER BREAK 1 */
 @media #{$break-1}
   main
     &.slim
       width: 400px
-  
+
   .modal
     .text-input, .button
       margin-left: auto
       margin-right: auto
       max-width: 300px
 
+
+/* RESPONSIVE CSS AFTER BREAK 2 */
 @media #{$break-2}
   // Pages
   main
@@ -60,7 +76,11 @@ $break-4: 'screen and (min-width: #{$size-4})'
   .modal
     width: 600px
 
+
+/* RESPONSIVE CSS AFTER BREAK 3 */
 @media #{$break-3}
   
 
+
+/* RESPONSIVE CSS AFTER BREAK 4 */
 @media #{$break-4}
