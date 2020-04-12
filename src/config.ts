@@ -1,5 +1,5 @@
 const https: boolean = true
-const local: string = '192.168.178.12'
+const local: string = '127.0.0.1'//'192.168.2.19'
 
 export default {
     API_URL: `http${https?'s':''}://${local}:3000/api/v0`,

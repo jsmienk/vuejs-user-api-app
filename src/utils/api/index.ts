@@ -1,7 +1,7 @@
 import Axios, { AxiosResponse } from 'axios'
 import Config from '@/config'
 import { User, DeviceSession, AccountLog } from './models'
-import { getAuthUserId, logout } from './auth'
+import { getAuthUserId } from './auth'
 
 
 const API = Axios.create({
